@@ -7,59 +7,34 @@ This project implements a clustering algorithm based on symmetric Non-negative M
 ## Algorithm Overview
 
 ### SymNMF Algorithm
-Given a set of \( n \) points \( X = x_1, x_2, ..., x_N \in \mathbb{R}^d \), the symNMF algorithm involves the following steps:
+Given a set of \( n \) points $X = x_1, x_2, ..., x_N \in \mathbb{R}^d \$, the symNMF algorithm involves the following steps:
 
 1. **Form the Similarity Matrix \( A \)**:
-   \[
-   a_{ij} = \exp \left( - \frac{\|x_i - x_j\|^2}{2} \right) \quad \text{if} \quad i \neq j, \quad a_{ii} = 0
-   \]
-   where \( \| \cdot \| \) denotes the Euclidean distance.
+   $a_{ij} = \exp \left( - \frac{\|x_i - x_j\|^2}{2} \right) \quad \text{if} \quad i \neq j, \quad a_{ii} = 0$
+   where $| \cdot \|$ denotes the Euclidean distance.
 
-2. **Compute the Diagonal Degree Matrix \( D \)**:
-   \[
-   d_i = \sum_{j=1}^{n} a_{ij}
-   \]
+2. **Compute the Diagonal Degree Matrix $( D )$**:
+   $d_i = \sum_{j=1}^{n} a_{ij}$
 
-3. **Compute the Normalized Similarity Matrix \( W \)**:
-   \[
-   W = D^{-1/2} A D^{-1/2}
-   \]
+3. **Compute the Normalized Similarity Matrix $( W )$**:
+   $W = D^{-1/2} A D^{-1/2}$
 
-4. **Find \( H \) that solves**:
-   \[
-   \min_{H \geq 0} \|W - H H^T\|_F^2
-   \]
-   where \( \| \cdot \|_F \) denotes the Frobenius norm.
+4. **Find $( H )$ that solves**:
+   $\min_{H \geq 0} \|W - H H^T\|_F^2$
+   where $\( \| \cdot \|_F \)$ denotes the Frobenius norm.
 
-### Optimizing \( H \)
+## Project Description
 
-1. **Initialize \( H \)**:
-   Randomly initialize \( H \) with values from the interval \([0, 2 \cdot \sqrt{m/k}]\), where \( m \) is the average of all entries of \( W \).
+### Files
 
-2. **Update \( H \)**:
-   \[
-   H_{ij}^{(t+1)} \leftarrow H_{ij}^{(t)} \left(1 - \beta + \beta \frac{(W H^{(t)})_{ij}}{(H^{(t)} (H^{(t)})^T H^{(t)})_{ij}} \right)
-   \]
-   where \( \beta = 0.5 \).
-
-3. **Convergence**:
-   Update \( H \) until the maximum number of iterations is reached or \( \|H^{(t+1)} - H^{(t)}\|_F < \epsilon \).
-
-### Clustering Solution
-\( H \) can be viewed as an association matrix that assigns each element to the cluster with the highest association score.
-
-## Assignment Description
-
-### Files to Implement
-
-1. **symnmf.py**: Python interface for the symNMF algorithm.
-2. **symnmf.h**: C header file defining function prototypes.
-3. **symnmf.c**: C implementation of the symNMF algorithm.
-4. **symnmfmodule.c**: Python C API wrapper.
+1. **Python/symnmf.py**: Python interface for the symNMF algorithm.
+2. **C/symnmf.h**: C header file defining function prototypes.
+3. **C/symnmf.c**: C implementation of the symNMF algorithm.
+4. **API/symnmfmodule.c**: Python C API wrapper.
 5. **analysis.py**: Script to analyze the algorithm and compare it to K-means.
-6. **setup.py**: Setup file for building the C extension.
+6. **API/setup.py**: Setup file for building the C extension.
 7. **Makefile**: Script to build the C interface.
-8. Additional *.c/h files as needed.
+8. **Python/kmeans.py**: Implementation of the K-means clustering algorithm.
 
 ### Python Program (symnmf.py)
 - **Arguments**:
@@ -97,4 +72,35 @@ Script to compile the C interface with appropriate flags.
 
 ### Build
 ```bash
+make
 python3 setup.py build_ext --inplace
+```
+### Run
+#### Running the Python program
+```
+python3 Python\symnmf.py k goal your_input.txt
+```
+#### Parameters
+Where: 
+- k: The desired number of clusers.
+- goal: Can get the following values:
+-  i. symnmf: Perform full the symNMF as described in 1 and output H.
+- ii. sym: Calculate and output the similarity matrix.
+- iii. ddg: Calculate and output the Diagonal Degree Matrix.
+- iv. norm: Calculate and output the normalized similarity matrix.
+- your_input.txt is of the form::
+```file
+1,2,3
+4,5,6
+```
+
+#### Running the C program
+```
+./symnmf sym input_1.txt
+```
+#### Parameters
+Where: 
+- goal: Can get the following values:
+- i. sym: Calculate and output the similarity matrix.
+- ii. ddg: Calculate and output the Diagonal Degree Matrix.
+- iii. norm: Calculate and output the normalized similarity matrix.
